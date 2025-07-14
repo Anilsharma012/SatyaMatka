@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import BASE_URL from "../src/config";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -78,7 +79,7 @@ const AdminPayoutManagement = () => {
       setLoading(true);
       const token = localStorage.getItem("admin_token");
 
-      const response = await fetch("/api/admin/games", {
+      const response = await fetch(`${BASE_URL}/api/admin/games`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -112,7 +113,7 @@ const AdminPayoutManagement = () => {
     try {
       const token = localStorage.getItem("admin_token");
 
-      const response = await fetch(`/api/admin/games/${selectedGame._id}`, {
+      const response = await fetch(`${BASE_URL}/api/admin/games/${selectedGame._id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -167,7 +168,7 @@ Are you sure you want to proceed?`);
     try {
       const token = localStorage.getItem("admin_token");
 
-      const response = await fetch("/api/admin/games/update-payouts", {
+      const response = await fetch(`${BASE_URL}/api/admin/games/update-payouts`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });

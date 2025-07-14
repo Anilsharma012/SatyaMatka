@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import BASE_URL from "../src/config";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -116,7 +117,7 @@ const AdminResults = () => {
   const updatePayoutRates = async () => {
     try {
       const token = localStorage.getItem("admin_token");
-      await fetch("/api/admin/games/update-payouts", {
+      await fetch(`${BASE_URL}/api/admin/games/update-payouts`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -135,13 +136,13 @@ const AdminResults = () => {
 
       const today = new Date().toISOString().split("T")[0];
       const [gamesResponse, resultsResponse, betsResponse] = await Promise.all([
-        fetch("/api/admin/games", {
+        fetch(`${BASE_URL}/api/admin/games`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch("/api/admin/game-results?limit=100", {
+        fetch(`${BASE_URL}/api/admin/game-results?limit=100`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch(`/api/admin/bets?date=${today}&limit=1000`, {
+        fetch(`${BASE_URL}/api/admin/bets?date=${today}&limit=1000`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
@@ -254,7 +255,7 @@ const AdminResults = () => {
       console.log("🎯 Declaring result for game:", selectedGame.name);
 
       const response = await fetch(
-        `/api/admin/games/${selectedGame._id}/declare-result`,
+        `${BASE_URL}/api/admin/games/${selectedGame._id}/declare-result`,
         {
           method: "POST",
           headers: {

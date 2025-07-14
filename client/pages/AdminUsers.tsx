@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../src/config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -132,7 +133,7 @@ const AdminUsers = () => {
 
       console.log("Fetching users with params:", params.toString());
 
-      const response = await fetch(`/api/admin/users?${params}`, {
+      const response = await fetch(`${BASE_URL}/api/admin/users?${params}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -246,7 +247,7 @@ const AdminUsers = () => {
   ) => {
     try {
       const token = localStorage.getItem("admin_token");
-      const response = await fetch(`/api/admin/users/${userId}/add-money`, {
+      const response = await fetch(`${BASE_URL}/api/admin/users/${userId}/add-money`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

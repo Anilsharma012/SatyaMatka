@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import BASE_URL from "../src/config";
 import { useToast } from "@/hooks/use-toast";
 import { safeParseResponse } from "@/lib/responseUtils";
 import { Button } from "@/components/ui/button";
@@ -279,7 +280,7 @@ const GamePlay = () => {
         controller.abort();
       }, 10000);
 
-      const response = await fetch(`/api/games/${gameId}`, {
+      const response = await fetch(`${BASE_URL}/api/games/${gameId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -400,7 +401,7 @@ const GamePlay = () => {
         controller.abort();
       }, 8000);
 
-      const response = await fetch("/api/wallet/balance", {
+      const response = await fetch(`${BASE_URL}/api/wallet/balance`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -534,7 +535,7 @@ const GamePlay = () => {
 
       console.log("🎯 Placing REAL bet in MongoDB:", betPayload);
 
-      const response = await fetch("/api/games/place-bet", {
+      const response = await fetch(`${BASE_URL}/api/games/place-bet`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

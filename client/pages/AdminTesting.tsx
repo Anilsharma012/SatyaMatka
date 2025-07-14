@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import BASE_URL from "../src/config";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -143,7 +144,7 @@ const AdminTesting = () => {
   const fetchSystemHealth = async () => {
     try {
       const token = localStorage.getItem("admin_token");
-      const response = await fetch("/api/admin/system/health", {
+      const response = await fetch(`${BASE_URL}/api/admin/system/health`, {
         headers: { Authorization: `Bearer ${token}` },
       }).catch(() => null);
 
@@ -190,7 +191,7 @@ const AdminTesting = () => {
 
     try {
       const token = localStorage.getItem("admin_token");
-      const response = await fetch(`/api/admin/test/${testType}`, {
+      const response = await fetch(`${BASE_URL}/api/admin/test/${testType}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

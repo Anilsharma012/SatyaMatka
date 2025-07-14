@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import BASE_URL from "../src/config";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -108,7 +109,7 @@ const MyBets = () => {
         ...(filters.status !== "all" && { status: filters.status }),
       });
 
-      const response = await fetch(`/api/games/user-bets?${queryParams}`, {
+      const response = await fetch(`${BASE_URL}/api/games/user-bets?${queryParams}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

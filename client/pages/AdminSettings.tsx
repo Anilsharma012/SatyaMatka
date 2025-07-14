@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import BASE_URL from "../src/config";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -147,7 +148,7 @@ const AdminSettings = () => {
       setLoading(true);
       const token = localStorage.getItem("admin_token");
 
-      const response = await fetch("/api/admin/settings", {
+      const response = await fetch(`${BASE_URL}/api/admin/settings`, {
         headers: { Authorization: `Bearer ${token}` },
       }).catch(() => null);
 
@@ -182,7 +183,7 @@ const AdminSettings = () => {
       setSaving(true);
       const token = localStorage.getItem("admin_token");
 
-      const response = await fetch("/api/admin/settings", {
+      const response = await fetch(`${BASE_URL}/api/admin/settings`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,

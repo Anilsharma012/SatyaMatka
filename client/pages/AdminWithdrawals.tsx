@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import BASE_URL from "../src/config";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -164,7 +165,7 @@ const AdminWithdrawals = () => {
     try {
       const token = localStorage.getItem("admin_token");
       const response = await fetch(
-        `/api/admin/transactions/${selectedWithdrawal._id}/process`,
+        `${BASE_URL}/api/admin/transactions/${selectedWithdrawal._id}/process`,
         {
           method: "PUT",
           headers: {

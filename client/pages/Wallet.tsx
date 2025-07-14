@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../src/config";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -85,16 +86,16 @@ const Wallet = () => {
         withdrawalResponse,
         statsResponse,
       ] = await Promise.all([
-        fetch("/api/wallet/balance", {
+        fetch(`${BASE_URL}/api/wallet/balance`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch("/api/wallet/deposit-history?limit=10", {
+        fetch(`${BASE_URL}/api/wallet/deposit-history?limit=10`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch("/api/wallet/transactions?type=withdrawal&limit=10", {
+        fetch(`${BASE_URL}/api/wallet/transactions?type=withdrawal&limit=10`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch("/api/wallet/stats", {
+        fetch(`${BASE_URL}/api/wallet/stats`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);

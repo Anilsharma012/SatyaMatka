@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../src/config";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -80,7 +81,7 @@ const AdminDashboard = () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-      const response = await fetch("/api/admin/dashboard/stats", {
+      const response = await fetch(`${BASE_URL}/api/admin/dashboard/stats`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

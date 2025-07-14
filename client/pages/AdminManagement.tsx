@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import BASE_URL from "../src/config";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -153,10 +154,10 @@ const AdminManagement = () => {
 
       // Fetch admins and activities with proper error handling
       const [adminsResponse, activitiesResponse] = await Promise.all([
-        fetch("/api/admin/management/admins", {
+        fetch(`${BASE_URL}/api/admin/management/admins`, {
           headers: { Authorization: `Bearer ${token}` },
         }).catch(() => null),
-        fetch("/api/admin/management/activities", {
+        fetch(`${BASE_URL}/api/admin/management/activities`, {
           headers: { Authorization: `Bearer ${token}` },
         }).catch(() => null),
       ]);
@@ -303,7 +304,7 @@ const AdminManagement = () => {
   const handleCreateAdmin = async () => {
     try {
       const token = localStorage.getItem("admin_token");
-      const response = await fetch("/api/admin/management/admins", {
+      const response = await fetch(`${BASE_URL}/api/admin/management/admins`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -361,7 +362,7 @@ const AdminManagement = () => {
     try {
       const token = localStorage.getItem("admin_token");
       const response = await fetch(
-        `/api/admin/management/admins/${selectedAdmin._id}`,
+        `${BASE_URL}/api/admin/management/admins/${selectedAdmin._id}`,
         {
           method: "PUT",
           headers: {
@@ -415,7 +416,7 @@ const AdminManagement = () => {
 
     try {
       const token = localStorage.getItem("admin_token");
-      const response = await fetch(`/api/admin/management/admins/${adminId}`, {
+      const response = await fetch(`${BASE_URL}/api/admin/management/admins/${adminId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

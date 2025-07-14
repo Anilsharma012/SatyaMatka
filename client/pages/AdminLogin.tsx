@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import BASE_URL from "../src/config";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,7 +22,7 @@ const AdminLogin = () => {
     setError("");
 
     try {
-      const response = await fetch("/api/auth/admin-login", {
+      const response = await fetch(`${BASE_URL}/api/auth/admin-login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

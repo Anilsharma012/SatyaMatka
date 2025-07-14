@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../src/config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -96,7 +97,7 @@ const AdminTransactions = () => {
         ...(searchTerm && { search: searchTerm }),
       });
 
-      const response = await fetch(`/api/admin/transactions?${params}`, {
+      const response = await fetch(`${BASE_URL}/api/admin/transactions?${params}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

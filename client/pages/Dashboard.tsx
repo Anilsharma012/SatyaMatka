@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../src/config";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,7 +52,7 @@ const Dashboard = () => {
         return;
       }
 
-      const response = await fetch("/api/wallet/balance", {
+      const response = await fetch(`${BASE_URL}/api/wallet/balance`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

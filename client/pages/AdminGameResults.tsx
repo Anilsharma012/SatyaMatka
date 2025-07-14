@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import BASE_URL from "../src/config";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -115,10 +116,10 @@ const AdminGameResults = () => {
       const token = localStorage.getItem("admin_token");
 
       const [gamesResponse, resultsResponse] = await Promise.all([
-        fetch("/api/admin/games", {
+        fetch(`${BASE_URL}/api/admin/games`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch("/api/admin/game-results?limit=50", {
+        fetch(`${BASE_URL}/api/admin/game-results?limit=50`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
@@ -203,7 +204,7 @@ const AdminGameResults = () => {
     try {
       const token = localStorage.getItem("admin_token");
       const response = await fetch(
-        `/api/admin/games/${selectedGame._id}/declare-result`,
+        `${BASE_URL}/api/admin/games/${selectedGame._id}/declare-result`,
         {
           method: "POST",
           headers: {

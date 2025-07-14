@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import BASE_URL from "../src/config";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -93,7 +94,7 @@ const GameResults = () => {
 
   const fetchGameResult = async () => {
     try {
-      const response = await fetch(`/api/results/game/${gameId}`);
+      const response = await fetch(`${BASE_URL}/api/results/game/${gameId}`);
       if (response.ok) {
         const data = await response.json();
         setGameResult(data.data);
@@ -106,7 +107,7 @@ const GameResults = () => {
   const fetchUserBets = async () => {
     try {
       const token = localStorage.getItem("matka_token");
-      const response = await fetch(`/api/results/user-bets/${gameId}`, {
+      const response = await fetch(`${BASE_URL}/api/results/user-bets/${gameId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

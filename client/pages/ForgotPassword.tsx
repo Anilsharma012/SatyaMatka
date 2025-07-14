@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import BASE_URL from "../src/config";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Smartphone, ArrowLeft, CheckCircle } from "lucide-react";
@@ -18,7 +19,7 @@ const ForgotPassword = () => {
     setError("");
 
     try {
-      const response = await fetch("/api/auth/forgot-password", {
+      const response = await fetch(`${BASE_URL}/api/auth/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

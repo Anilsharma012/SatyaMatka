@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import BASE_URL from "../src/config";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -92,7 +93,7 @@ const AdminResultManagement = () => {
   const fetchPendingResults = async () => {
     try {
       const token = localStorage.getItem("admin_token");
-      const response = await fetch("/api/results/pending", {
+      const response = await fetch(`${BASE_URL}/api/results/pending`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -116,7 +117,7 @@ const AdminResultManagement = () => {
   const fetchResultHistory = async () => {
     try {
       const token = localStorage.getItem("admin_token");
-      const response = await fetch("/api/results/history?limit=10", {
+      const response = await fetch(`${BASE_URL}/api/results/history?limit=10`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -144,7 +145,7 @@ const AdminResultManagement = () => {
     setDeclaring(true);
     try {
       const token = localStorage.getItem("admin_token");
-      const response = await fetch(`/api/results/declare/${selectedGame._id}`, {
+      const response = await fetch(`${BASE_URL}/api/results/declare/${selectedGame._id}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

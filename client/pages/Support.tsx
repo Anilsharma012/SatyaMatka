@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import BASE_URL from "../src/config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -89,7 +90,7 @@ const Support = () => {
         return;
       }
 
-      const response = await fetch("/api/support/tickets", {
+      const response = await fetch(`${BASE_URL}/api/support/tickets`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -131,7 +132,7 @@ const Support = () => {
         return;
       }
 
-      const response = await fetch("/api/support/tickets", {
+      const response = await fetch(`${BASE_URL}/api/support/tickets`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -194,7 +195,7 @@ const Support = () => {
       }
 
       const response = await fetch(
-        `/api/support/tickets/${selectedTicket._id}/response`,
+        `${BASE_URL}/api/support/tickets/${selectedTicket._id}/response`,
         {
           method: "POST",
           headers: {

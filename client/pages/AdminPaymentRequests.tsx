@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import BASE_URL from "../src/config";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -119,7 +120,7 @@ const AdminPaymentRequests = () => {
       setLoading(true);
       const token = localStorage.getItem("admin_token");
       const response = await fetch(
-        `/api/admin/payment-requests?status=${statusFilter}&limit=50`,
+        `${BASE_URL}/api/admin/payment-requests?status=${statusFilter}&limit=50`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -210,7 +211,7 @@ const AdminPaymentRequests = () => {
     try {
       const token = localStorage.getItem("admin_token");
       const response = await fetch(
-        `/api/admin/payment-requests/${selectedRequest._id}/process`,
+        `${BASE_URL}/api/admin/payment-requests/${selectedRequest._id}/process`,
         {
           method: "PUT",
           headers: {

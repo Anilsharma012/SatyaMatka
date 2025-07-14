@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import BASE_URL from "../src/config";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -171,7 +172,7 @@ const AdminReports = () => {
       const token = localStorage.getItem("admin_token");
 
       const response = await fetch(
-        `/api/admin/reports?range=${dateRange}&status=${filterStatus}`,
+        `${BASE_URL}/api/admin/reports?range=${dateRange}&status=${filterStatus}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -206,7 +207,7 @@ const AdminReports = () => {
       const token = localStorage.getItem("admin_token");
 
       const response = await fetch(
-        `/api/admin/reports/export?format=${format}&type=${reportType}&range=${dateRange}`,
+        `${BASE_URL}/api/admin/reports/export?format=${format}&type=${reportType}&range=${dateRange}`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },

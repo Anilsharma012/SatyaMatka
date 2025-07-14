@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import BASE_URL from "../src/config";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -106,7 +107,7 @@ const AdminGameManagement = () => {
   const fetchGames = async () => {
     try {
       const token = localStorage.getItem("admin_token");
-      const response = await fetch("/api/admin/games", {
+      const response = await fetch(`${BASE_URL}/api/admin/games`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -162,7 +163,7 @@ const AdminGameManagement = () => {
     setUpdating(gameId);
     try {
       const token = localStorage.getItem("admin_token");
-      const response = await fetch(`/api/admin/games/${gameId}`, {
+      const response = await fetch(`${BASE_URL}/api/admin/games/${gameId}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -202,7 +203,7 @@ const AdminGameManagement = () => {
     setUpdating(gameId);
     try {
       const token = localStorage.getItem("admin_token");
-      const response = await fetch(`/api/admin/games/${gameId}/force-status`, {
+      const response = await fetch(`${BASE_URL}/api/admin/games/${gameId}/force-status`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -240,7 +241,7 @@ const AdminGameManagement = () => {
     setUpdating(gameData._id);
     try {
       const token = localStorage.getItem("admin_token");
-      const response = await fetch(`/api/admin/games/${gameData._id}`, {
+      const response = await fetch(`${BASE_URL}/api/admin/games/${gameData._id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,

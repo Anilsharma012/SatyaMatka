@@ -91,7 +91,7 @@ const AddMoney = () => {
 
     try {
       setGatewaysLoading(true);
-      const response = await fetch(`${BASE_URL}/payment-gateways/active`);
+      const response = await fetch(`${BASE_URL}/api/payment-gateways/active`);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -139,7 +139,7 @@ const AddMoney = () => {
       }
 
       setRequestsLoading(true);
-      const response = await fetch(`${BASE_URL}/payment-requests/my`, {
+      const response = await fetch(`${BASE_URL}/api/payment-requests/my`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -229,7 +229,7 @@ const AddMoney = () => {
         return;
       }
 
-      const response = await fetch(`${BASE_URL}/payment-requests`, {
+      const response = await fetch(`${BASE_URL}/api/payment-requests`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -327,7 +327,7 @@ const AddMoney = () => {
       const formData = new FormData();
       formData.append("paymentProof", file);
 
-      const response = await fetch(`${BASE_URL}/upload`, {
+      const response = await fetch(`${BASE_URL}/api/upload`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

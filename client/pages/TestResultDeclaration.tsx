@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import BASE_URL from "../src/config";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -12,7 +13,7 @@ const TestResultDeclaration = () => {
   const declareResult = async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/test/declare-result", {
+      const response = await fetch(`${BASE_URL}/api/test/declare-result`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

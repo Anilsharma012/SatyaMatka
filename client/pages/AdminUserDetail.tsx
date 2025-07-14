@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import BASE_URL from "../src/config";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -83,7 +84,7 @@ const AdminUserDetail = () => {
 
       console.log(`Fetching user detail for ID: ${userId}`);
 
-      const response = await fetch(`/api/admin/users/${userId}`, {
+      const response = await fetch(`${BASE_URL}/api/admin/users/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -147,7 +148,7 @@ const AdminUserDetail = () => {
 
     try {
       const token = localStorage.getItem("admin_token");
-      const response = await fetch(`/api/admin/users/${userId}/status`, {
+      const response = await fetch(`${BASE_URL}/api/admin/users/${userId}/status`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,

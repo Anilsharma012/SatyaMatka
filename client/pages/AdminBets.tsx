@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../src/config";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -118,7 +119,7 @@ const AdminBets = () => {
         ...(gameTypeFilter !== "all" && { gameType: gameTypeFilter }),
       });
 
-      const response = await fetch(`/api/admin/bets?${queryParams}`, {
+      const response = await fetch(`${BASE_URL}/api/admin/bets?${queryParams}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

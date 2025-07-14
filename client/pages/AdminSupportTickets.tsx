@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import BASE_URL from "../src/config";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -125,7 +126,7 @@ const AdminSupportTickets = () => {
       queryParams.append("limit", "50");
 
       const response = await fetch(
-        `/api/admin/support/tickets?${queryParams}`,
+        `${BASE_URL}/api/admin/support/tickets?${queryParams}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -273,7 +274,7 @@ const AdminSupportTickets = () => {
       }
 
       const response = await fetch(
-        `/api/admin/support/tickets/${selectedTicket._id}/response`,
+        `${BASE_URL}/api/admin/support/tickets/${selectedTicket._id}/response`,
         {
           method: "POST",
           headers: {
@@ -339,7 +340,7 @@ const AdminSupportTickets = () => {
       }
 
       const response = await fetch(
-        `/api/admin/support/tickets/${ticketId}/status`,
+        `${BASE_URL}/api/admin/support/tickets/${ticketId}/status`,
         {
           method: "PUT",
           headers: {

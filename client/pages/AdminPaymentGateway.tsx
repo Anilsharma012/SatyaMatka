@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import BASE_URL from "../src/config";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -114,7 +115,7 @@ const AdminPaymentGateway = () => {
   const fetchGateways = async () => {
     try {
       const token = localStorage.getItem("admin_token");
-      const response = await fetch("/api/admin/payment-gateways", {
+      const response = await fetch(`${BASE_URL}/api/admin/payment-gateways`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -228,7 +229,7 @@ const AdminPaymentGateway = () => {
 
     try {
       const token = localStorage.getItem("admin_token");
-      const response = await fetch(`/api/admin/payment-gateways/${gatewayId}`, {
+      const response = await fetch(`${BASE_URL}/api/admin/payment-gateways/${gatewayId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -253,7 +254,7 @@ const AdminPaymentGateway = () => {
     try {
       const token = localStorage.getItem("admin_token");
       const response = await fetch(
-        `/api/admin/payment-gateways/${gateway._id}`,
+        `${BASE_URL}/api/admin/payment-gateways/${gateway._id}`,
         {
           method: "PUT",
           headers: {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../src/config";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -64,7 +65,7 @@ const Games = () => {
 
   const fetchGames = async () => {
     try {
-      const response = await fetch("/api/games", {
+      const response = await fetch(`${BASE_URL}/api/games`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("matka_token")}`,
         },
@@ -83,7 +84,7 @@ const Games = () => {
 
   const fetchRecentResults = async () => {
     try {
-      const response = await fetch("/api/games/results?limit=10");
+      const response = await fetch(`${BASE_URL}/api/games/results?limit=10`);
       if (response.ok) {
         const data = await response.json();
         setResults(data.data.results || []);

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../src/config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,7 +40,7 @@ const Withdraw = () => {
         return;
       }
 
-      const response = await fetch("/api/wallet/balance", {
+      const response = await fetch(`${BASE_URL}/api/wallet/balance`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -111,7 +112,7 @@ const Withdraw = () => {
         return;
       }
 
-      const response = await fetch("/api/wallet/withdraw", {
+      const response = await fetch(`${BASE_URL}/api/wallet/withdraw`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
