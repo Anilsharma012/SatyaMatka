@@ -78,7 +78,7 @@ const allowedOrigins = [
   "http://localhost:8080", // Netlify dev / custom
   "http://127.0.0.1:5173", // sometimes needed
   "http://127.0.0.1:8080",
-  "https://matkagame.netlify.app", // production
+  "https://satyamatka.netlify.app/", // production
   /https:\/\/.*\.fly\.dev$/, // Builder.io preview environment
 ];
 
