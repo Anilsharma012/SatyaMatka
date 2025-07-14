@@ -87,27 +87,31 @@ const GamePlay = () => {
 
   // Bet form state
   const [betData, setBetData] = useState({
-    betNumber: "",
-    betAmount: "",
-    harufPosition: "first" as "first" | "last",
-    crossingCombination: "",
-    crossingNumbers: "",
-    crossingAmount: "",
-    jodaCut: false,
-    generatedCrossings: [] as {
-      number: string;
-      amount: number;
-      type?: "crossing" | "joda_cut";
-    }[],
-    allCrossings: [] as { number: string; amount: number; type: "crossing" }[],
-    jodaCutCrossings: [] as {
-      number: string;
-      amount: number;
-      type: "joda_cut";
-    }[],
-    crossingTotal: 0,
-    jodaCutTotal: 0,
-  });
+  betNumber: "",
+  betAmount: "",
+  harufPosition: "first" as "first" | "last",
+  crossingCombination: "",
+  crossingNumbers: "",
+  crossingAmount: "",
+  jodaCut: false,
+  generatedCrossings: [] as {
+    number: string;
+    amount: number;
+    type?: "crossing" | "joda_cut";
+  }[],
+  allCrossings: [] as { number: string; amount: number; type: "crossing" }[],
+  jodaCutCrossings: [] as {
+    number: string;
+    amount: number;
+    type: "joda_cut";
+  }[],
+  crossingTotal: 0,
+  jodaCutTotal: 0,
+
+  // ✅ Add this line for Haruf inputs
+  harufBets: {} as Record<string, number>,
+});
+
 
   // Hot numbers and trending bets (mock data)
   const [hotNumbers, setHotNumbers] = useState({
@@ -989,7 +993,7 @@ const GamePlay = () => {
                   </TabsContent>
 
                   {/* Haruf Game - Andar/Bahar Style */}
-               <TabsContent value="haruf">
+              <TabsContent value="haruf">
   <div className="bg-gray-800 rounded-2xl p-4">
     <div className="grid grid-cols-2 gap-4">
       {/* Andar Game */}
@@ -1068,7 +1072,7 @@ const GamePlay = () => {
         <span>
           ₹
           {Object.values(betData.harufBets || {}).reduce(
-            (sum, val) => sum + (parseInt(val) || 0),
+            (sum, val) => sum + (parseInt(val as any) || 0),
             0
           )}
         </span>
@@ -1076,7 +1080,7 @@ const GamePlay = () => {
 
       <Button
         className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold text-lg py-3 rounded-xl"
-        onClick={() => {
+        onClick={async () => {
           const entries = Object.entries(betData.harufBets || {}).filter(
             ([_, val]) => val > 0
           );
@@ -1086,18 +1090,78 @@ const GamePlay = () => {
             return;
           }
 
-          const [number, amount] = entries[0]; // first valid bet
-          setBetData((prev) => ({
-            ...prev,
-            betNumber: number,
-            betAmount: amount.toString(),
-            harufPosition: number.startsWith("A") ? "first" : "last",
-          }));
-          setShowBetModal(true);
+          const token = localStorage.getItem("matka_token");
+          if (!token) {
+            alert("Login required");
+            return;
+          }
+
+          setPlacing(true);
+          try {
+            let totalPlaced = 0;
+
+            for (const [number, amount] of entries) {
+              const betPayload = {
+                gameId: game!._id,
+                betType: "haruf",
+                betNumber: number,
+                betAmount: amount,
+                harufPosition: number.startsWith("A") ? "first" : "last",
+              };
+
+              const res = await fetch(`${BASE_URL}/api/games/place-bet`, {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(betPayload),
+              });
+
+              const data = await res.json();
+              if (res.ok && !data.error) {
+                totalPlaced += amount;
+              } else {
+                console.warn(`❌ Failed for ${number}:`, data.message);
+              }
+            }
+
+            if (totalPlaced > 0) {
+              toast({
+                title: "✅ Bet Placed",
+                description: `₹${totalPlaced} placed across ${entries.length} Haruf bets.`,
+                className: "border-green-500 bg-green-50 text-green-900",
+              });
+
+              await fetchWalletData();
+
+              setBetData((prev) => ({
+                ...prev,
+                harufBets: {},
+                betNumber: "",
+                betAmount: "",
+              }));
+            } else {
+              toast({
+                variant: "destructive",
+                title: "No Bets Placed",
+                description: "All bets failed or were invalid.",
+              });
+            }
+          } catch (err) {
+            console.error(err);
+            toast({
+              variant: "destructive",
+              title: "Server Error",
+              description: "Haruf bets failed.",
+            });
+          } finally {
+            setPlacing(false);
+          }
         }}
         disabled={
           Object.values(betData.harufBets || {}).reduce(
-            (sum, val) => sum + (parseInt(val) || 0),
+            (sum, val) => sum + (parseInt(val as any) || 0),
             0
           ) === 0
         }
@@ -1107,6 +1171,7 @@ const GamePlay = () => {
     </div>
   </div>
 </TabsContent>
+
 
 
 
@@ -1371,99 +1436,118 @@ const GamePlay = () => {
         </div>
 
         {/* Bet Modal */}
-        <Dialog open={showBetModal} onOpenChange={setShowBetModal}>
-          <DialogContent className="bg-matka-dark border-border">
-            <DialogHeader>
-              <DialogTitle className="text-matka-gold">
-                Confirm Your Bet (Real Money)
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <Label className="text-muted-foreground">Bet Type</Label>
-                  <p className="text-foreground font-semibold capitalize">
-                    {selectedBetType}
-                  </p>
-                </div>
-                <div>
-                  <Label className="text-muted-foreground">Number</Label>
-                  <p className="text-foreground font-semibold">
-                    {betData.betNumber}
-                  </p>
-                </div>
-                <div>
-                  <Label className="text-muted-foreground">Payout Rate</Label>
-                  <p className="text-foreground font-semibold">
-                    {selectedBetType === "jodi"
-                      ? game.jodiPayout
-                      : selectedBetType === "haruf"
-                        ? game.harufPayout
-                        : game.crossingPayout}
-                    :1
-                  </p>
-                </div>
-                {selectedBetType === "haruf" && (
-                  <div>
-                    <Label className="text-muted-foreground">Position</Label>
-                    <p className="text-foreground font-semibold capitalize">
-                      {betData.harufPosition} Digit
-                    </p>
-                  </div>
-                )}
-              </div>
-              <div>
-                <Label className="text-foreground">Bet Amount (₹)</Label>
-                <Input
-                  type="number"
-                  placeholder={`Min: ₹${game.minBet}, Max: ₹${game.maxBet}`}
-                  value={betData.betAmount}
-                  onChange={(e) =>
-                    setBetData((prev) => ({
-                      ...prev,
-                      betAmount: e.target.value,
-                    }))
-                  }
-                  className="mt-2"
-                />
-              </div>
-              {betData.betAmount && (
-                <div className="p-3 bg-matka-gold/10 rounded border border-matka-gold/30">
-                  <p className="text-sm text-muted-foreground">
-                    Potential Winning
-                  </p>
-                  <p className="text-xl font-bold text-matka-gold">
-                    ₹
-                    {(
-                      parseFloat(betData.betAmount || "0") *
-                      (selectedBetType === "jodi"
-                        ? game.jodiPayout
-                        : selectedBetType === "haruf"
-                          ? game.harufPayout
-                          : game.crossingPayout)
-                    ).toLocaleString()}
-                  </p>
-                </div>
-              )}
-            </div>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setShowBetModal(false)}
-                className="border-border text-foreground"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handlePlaceBet}
-                disabled={placing || !betData.betAmount}
-                className="bg-matka-gold text-matka-dark hover:bg-matka-gold-dark"
-              >
-                {placing ? "Placing..." : "Place Bet"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+       <Dialog
+  open={showBetModal}
+  onOpenChange={setShowBetModal}
+>
+  <DialogContent className="bg-matka-dark border-border">
+    <DialogHeader>
+      <DialogTitle className="text-matka-gold">
+        Confirm Your Bet (Real Money)
+      </DialogTitle>
+    </DialogHeader>
+
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-4 text-sm">
+        <div>
+          <Label className="text-muted-foreground">Bet Type</Label>
+          <p className="text-foreground font-semibold capitalize">
+            {selectedBetType}
+          </p>
+        </div>
+
+        <div>
+          <Label className="text-muted-foreground">Number</Label>
+          <p className="text-foreground font-semibold">
+            {selectedBetType === "haruf"
+              ? Object.entries(betData.harufBets || {})
+                  .filter(([_, v]) => v > 0)
+                  .map(([k, v]) => `${k}: ₹${v}`)
+                  .join(", ")
+              : betData.betNumber}
+          </p>
+        </div>
+
+        <div>
+          <Label className="text-muted-foreground">Payout Rate</Label>
+          <p className="text-foreground font-semibold">
+            {selectedBetType === "jodi"
+              ? game.jodiPayout
+              : selectedBetType === "haruf"
+              ? game.harufPayout
+              : game.crossingPayout}
+            :1
+          </p>
+        </div>
+
+        {selectedBetType === "haruf" && (
+          <div>
+            <Label className="text-muted-foreground">Position</Label>
+            <p className="text-foreground font-semibold capitalize">
+              Multiple
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* 💸 Amount Field Only For jodi/crossing */}
+      {selectedBetType !== "haruf" && (
+        <div>
+          <Label className="text-foreground">Bet Amount (₹)</Label>
+          <Input
+            type="number"
+            placeholder={`Min: ₹${game.minBet}, Max: ₹${game.maxBet}`}
+            value={betData.betAmount}
+            onChange={(e) =>
+              setBetData((prev) => ({
+                ...prev,
+                betAmount: e.target.value,
+              }))
+            }
+            className="mt-2"
+          />
+        </div>
+      )}
+
+      {/* 🎯 Potential Winning */}
+      {betData.betAmount && selectedBetType !== "haruf" && (
+        <div className="p-3 bg-matka-gold/10 rounded border border-matka-gold/30">
+          <p className="text-sm text-muted-foreground">Potential Winning</p>
+          <p className="text-xl font-bold text-matka-gold">
+            ₹
+            {(
+              parseFloat(betData.betAmount || "0") *
+              (selectedBetType === "jodi"
+                ? game.jodiPayout
+                : game.crossingPayout)
+            ).toLocaleString()}
+          </p>
+        </div>
+      )}
+    </div>
+
+    <DialogFooter>
+      <Button
+        variant="outline"
+        onClick={() => setShowBetModal(false)}
+        className="border-border text-foreground"
+      >
+        Cancel
+      </Button>
+
+      {selectedBetType !== "haruf" && (
+        <Button
+          onClick={handlePlaceBet}
+          disabled={placing || !betData.betAmount}
+          className="bg-matka-gold text-matka-dark hover:bg-matka-gold-dark"
+        >
+          {placing ? "Placing..." : "Place Bet"}
+        </Button>
+      )}
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
       </div>
     </div>
   );
