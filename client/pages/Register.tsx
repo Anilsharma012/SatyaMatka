@@ -58,7 +58,7 @@ const handleSubmit = async (e: React.FormEvent) => {
   try {
     const result: any = await new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
-      xhr.open("POST", `${BASE_URL}/auth/register`, true);
+      xhr.open("POST", `${BASE_URL}/api/auth/register`, true);
       xhr.setRequestHeader("Content-Type", "application/json");
 
       xhr.onload = () => {
