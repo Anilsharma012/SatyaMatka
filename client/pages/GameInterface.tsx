@@ -455,112 +455,107 @@ const GameInterface = () => {
           </div>
         )}
 
-        {activeTab === "Haruf" && (
-          <div className="max-w-4xl mx-auto px-2 sm:px-4">
-            {/* Haruf Games Container - Exactly matching screenshot */}
-            <div className="bg-gray-800 rounded-3xl p-3 sm:p-6 mb-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                {/* Andar Game */}
-                <div className="space-y-4">
-                  <h3 className="text-gray-300 text-lg font-medium text-center mb-4">
-                    Andar Game
-                  </h3>
+       {activeTab === "Haruf" && (
+  <div className="max-w-4xl mx-auto px-2 sm:px-4">
+    {/* Haruf Games Container */}
+    <div className="bg-gray-800 rounded-3xl p-3 sm:p-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        {/* Andar Game */}
+        <div className="space-y-4">
+          <h3 className="text-gray-300 text-lg font-medium text-center mb-4">
+            Andar Game
+          </h3>
 
-                  {Array.from({ length: 10 }, (_, i) => (
-                    <div key={i} className="flex gap-3">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-600 rounded-xl text-white font-medium text-sm sm:text-base flex items-center justify-center">
-                        A{i}
-                      </div>
-                      <input
-                        type="number"
-                        placeholder="00"
-                        value={harufBets[`A${i}`] || ""}
-                        onChange={(e) => {
-                          const value = parseInt(e.target.value) || 0;
-                          if (value <= 5000) {
-                            handleHarufBet(`A${i}`, value);
-                          }
-                        }}
-                        className="flex-1 h-10 sm:h-12 bg-gray-600 rounded-xl text-white text-center font-medium text-sm sm:text-base border-none outline-none placeholder-gray-400 focus:bg-gray-500 transition-colors"
-                      />
-                    </div>
-                  ))}
-                </div>
-
-                {/* Bahar Game */}
-                <div className="space-y-4">
-                  <h3 className="text-gray-300 text-lg font-medium text-center mb-4">
-                    Bahar Game
-                  </h3>
-
-                  {Array.from({ length: 10 }, (_, i) => (
-                    <div key={i} className="flex gap-3">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-600 rounded-xl text-white font-medium text-sm sm:text-base flex items-center justify-center">
-                        B{i}
-                      </div>
-                      <input
-                        type="number"
-                        placeholder="00"
-                        value={harufBets[`B${i}`] || ""}
-                        onChange={(e) => {
-                          const value = parseInt(e.target.value) || 0;
-                          if (value <= 5000) {
-                            handleHarufBet(`B${i}`, value);
-                          }
-                        }}
-                        className="flex-1 h-10 sm:h-12 bg-gray-600 rounded-xl text-white text-center font-medium text-sm sm:text-base border-none outline-none placeholder-gray-400 focus:bg-gray-500 transition-colors"
-                      />
-                    </div>
-                  ))}
-                </div>
+          {Array.from({ length: 10 }, (_, i) => (
+            <div key={`A${i}`} className="flex gap-3 items-center">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-600 rounded-xl text-white font-medium text-sm sm:text-base flex items-center justify-center">
+                A{i}
               </div>
+              <Input
+                type="number"
+                placeholder="00"
+                value={harufBets[`A${i}`] || ""}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value) || 0;
+                  if (value <= 5000) {
+                    handleHarufBet(`A${i}`, value);
+                  }
+                }}
+                className="flex-1 h-10 sm:h-12 bg-gray-600 rounded-xl text-white text-center font-medium text-sm sm:text-base border-none outline-none placeholder-gray-400 focus:bg-gray-500 transition-colors"
+              />
             </div>
+          ))}
+        </div>
 
-            {/* Save Button */}
-            <Button
-              className="w-full mb-8 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-4 text-xl rounded-full transition-all duration-300"
-              onClick={() => {
-                const totalHarufAmount = Object.values(harufBets).reduce(
-                  (sum, amount) => sum + amount,
-                  0,
-                );
-                if (totalHarufAmount > 0) {
-                  setTotalAmount(totalHarufAmount);
-                  alert(`Haruf bets saved! Total: ₹${totalHarufAmount}`);
-                } else {
-                  alert("कृपया कम से कम एक bet लगाएं");
-                }
-              }}
-            >
-              SAVE
-            </Button>
+        {/* Bahar Game */}
+        <div className="space-y-4">
+          <h3 className="text-gray-300 text-lg font-medium text-center mb-4">
+            Bahar Game
+          </h3>
 
-            {/* Bottom Total and Submit */}
-            <div className="bg-gray-800 rounded-3xl p-6 flex items-center justify-between">
-              <div>
-                <div className="text-gray-400 text-base">Total Amount</div>
-                <div className="text-white text-3xl font-bold">
-                  {Object.values(harufBets).reduce(
-                    (sum, amount) => sum + amount,
-                    0,
-                  )}
-                </div>
+          {Array.from({ length: 10 }, (_, i) => (
+            <div key={`B${i}`} className="flex gap-3 items-center">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-600 rounded-xl text-white font-medium text-sm sm:text-base flex items-center justify-center">
+                B{i}
               </div>
-              <Button
-                className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold px-8 py-3 text-lg rounded-full"
-                onClick={handleSubmit}
-                disabled={
-                  Object.values(harufBets).reduce(
-                    (sum, amount) => sum + amount,
-                    0,
-                  ) === 0
-                }
-              >
-                SUBMIT
-              </Button>
+              <Input
+                type="number"
+                placeholder="00"
+                value={harufBets[`B${i}`] || ""}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value) || 0;
+                  if (value <= 5000) {
+                    handleHarufBet(`B${i}`, value);
+                  }
+                }}
+                className="flex-1 h-10 sm:h-12 bg-gray-600 rounded-xl text-white text-center font-medium text-sm sm:text-base border-none outline-none placeholder-gray-400 focus:bg-gray-500 transition-colors"
+              />
             </div>
-          </div>
-        )}
+          ))}
+        </div>
+      </div>
+    </div>
+
+    {/* SAVE Button */}
+    <Button
+      className="w-full mb-8 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-4 text-xl rounded-full transition-all duration-300"
+      onClick={() => {
+        const totalHarufAmount = Object.values(harufBets).reduce(
+          (sum, amount) => sum + amount,
+          0
+        );
+        if (totalHarufAmount > 0) {
+          setTotalAmount(totalHarufAmount);
+          alert(`Haruf bets saved! Total: ₹${totalHarufAmount}`);
+        } else {
+          alert("कृपया कम से कम एक bet लगाएं");
+        }
+      }}
+    >
+      SAVE
+    </Button>
+
+    {/* Bottom Total and Submit */}
+    <div className="bg-gray-800 rounded-3xl p-6 flex items-center justify-between">
+      <div>
+        <div className="text-gray-400 text-base">Total Amount</div>
+        <div className="text-white text-3xl font-bold">
+          ₹{Object.values(harufBets).reduce((sum, amt) => sum + amt, 0)}
+        </div>
+      </div>
+      <Button
+        className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold px-8 py-3 text-lg rounded-full"
+        onClick={handleSubmit}
+        disabled={
+          Object.values(harufBets).reduce((sum, amt) => sum + amt, 0) === 0
+        }
+      >
+        SUBMIT
+      </Button>
+    </div>
+  </div>
+)}
+
       </div>
 
       {/* Bet Modal for Jodi */}
