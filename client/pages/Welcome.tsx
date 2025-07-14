@@ -79,7 +79,7 @@ const Welcome = () => {
             Welcome to
           </h1>
           <h2 className="text-matka-gold text-4xl md:text-5xl font-bold tracking-wide">
-            Dmatka App
+            TheMatka App
           </h2>
         </div>
 
