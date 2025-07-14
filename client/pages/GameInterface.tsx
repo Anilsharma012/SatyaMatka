@@ -456,7 +456,7 @@ const GameInterface = () => {
         )}
 
     {activeTab === "Haruf" && (
-  <div className="max-w-4xl mx-auto px-4 sm:px-6">
+  <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-32">
     <h2 className="text-center text-2xl font-bold text-white mb-4">
       Haruf Game
     </h2>
