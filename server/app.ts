@@ -78,39 +78,25 @@ const allowedOrigins = [
   "http://localhost:8080", // Netlify dev / custom
   "http://127.0.0.1:5173", // sometimes needed
   "http://127.0.0.1:8080",
-  "https://satyamatka.netlify.app/", // production
+  "https://satyamatka.netlify.app", // production
   /https:\/\/.*\.fly\.dev$/, // Builder.io preview environment
 ];
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (mobile apps, etc.)
-      if (!origin) {
-        callback(null, true);
-        return;
-      }
-
-      // Check if origin matches any allowed origins (strings or regex)
-      const isAllowed = allowedOrigins.some((allowedOrigin) => {
-        if (typeof allowedOrigin === "string") {
-          return allowedOrigin === origin;
-        } else if (allowedOrigin instanceof RegExp) {
-          return allowedOrigin.test(origin);
-        }
-        return false;
-      });
-
-      if (isAllowed) {
-        callback(null, true);
-      } else {
-        console.log(`❌ CORS blocked origin: ${origin}`);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: allowedOrigins,
     credentials: true,
-  }),
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "Accept",
+      "Origin",
+    ],
+  })
 );
+
 
 // Connect to MongoDB Atlas (non-blocking)
 connectDB()
