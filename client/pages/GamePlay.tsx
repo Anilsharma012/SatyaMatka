@@ -989,7 +989,7 @@ const GamePlay = () => {
                   </TabsContent>
 
                   {/* Haruf Game - Andar/Bahar Style */}
-                  <TabsContent value="haruf">
+              <TabsContent value="haruf">
   <div className="bg-gray-800 rounded-2xl p-4">
     <div className="grid grid-cols-2 gap-4">
       {/* Andar Game */}
@@ -1007,15 +1007,17 @@ const GamePlay = () => {
               <input
                 type="number"
                 placeholder="00"
-                value={betData.betNumber === key ? betData.betAmount : ""}
-                onChange={(e) =>
-                  setBetData({
-                    ...betData,
-                    betNumber: key,
-                    betAmount: e.target.value,
-                    harufPosition: "first",
-                  })
-                }
+                value={betData.harufBets?.[key] || ""}
+                onChange={(e) => {
+                  const updated = {
+                    ...betData.harufBets,
+                    [key]: parseInt(e.target.value || "0"),
+                  };
+                  setBetData((prev) => ({
+                    ...prev,
+                    harufBets: updated,
+                  }));
+                }}
                 className="flex-1 h-9 bg-gray-600 rounded text-white text-center font-medium text-sm border-none outline-none placeholder-gray-400 focus:bg-gray-500 transition-colors"
                 max="5000"
               />
@@ -1039,15 +1041,17 @@ const GamePlay = () => {
               <input
                 type="number"
                 placeholder="00"
-                value={betData.betNumber === key ? betData.betAmount : ""}
-                onChange={(e) =>
-                  setBetData({
-                    ...betData,
-                    betNumber: key,
-                    betAmount: e.target.value,
-                    harufPosition: "last",
-                  })
-                }
+                value={betData.harufBets?.[key] || ""}
+                onChange={(e) => {
+                  const updated = {
+                    ...betData.harufBets,
+                    [key]: parseInt(e.target.value || "0"),
+                  };
+                  setBetData((prev) => ({
+                    ...prev,
+                    harufBets: updated,
+                  }));
+                }}
                 className="flex-1 h-9 bg-gray-600 rounded text-white text-center font-medium text-sm border-none outline-none placeholder-gray-400 focus:bg-gray-500 transition-colors"
                 max="5000"
               />
@@ -1056,8 +1060,54 @@ const GamePlay = () => {
         })}
       </div>
     </div>
+
+    {/* 🟡 Total & Submit */}
+    <div className="mt-6 space-y-4">
+      <div className="bg-gray-900 p-4 rounded-xl text-white text-lg font-semibold flex justify-between">
+        <span>Total Bet Amount</span>
+        <span>
+          ₹
+          {Object.values(betData.harufBets || {}).reduce(
+            (sum, val) => sum + (parseInt(val) || 0),
+            0
+          )}
+        </span>
+      </div>
+
+      <Button
+        className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold text-lg py-3 rounded-xl"
+        onClick={() => {
+          const entries = Object.entries(betData.harufBets || {}).filter(
+            ([_, val]) => val > 0
+          );
+
+          if (entries.length === 0) {
+            alert("कृपया कम से कम एक Haruf number पर पैसे लगाएं");
+            return;
+          }
+
+          const [number, amount] = entries[0]; // first valid bet
+          setBetData((prev) => ({
+            ...prev,
+            betNumber: number,
+            betAmount: amount.toString(),
+            harufPosition: number.startsWith("A") ? "first" : "last",
+          }));
+          setShowBetModal(true);
+        }}
+        disabled={
+          Object.values(betData.harufBets || {}).reduce(
+            (sum, val) => sum + (parseInt(val) || 0),
+            0
+          ) === 0
+        }
+      >
+        SUBMIT HARUF BET
+      </Button>
+    </div>
   </div>
 </TabsContent>
+
 
 
                   {/* Crossing Game - Exact Screenshot Match */}
