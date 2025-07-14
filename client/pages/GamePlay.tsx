@@ -989,7 +989,7 @@ const GamePlay = () => {
                   </TabsContent>
 
                   {/* Haruf Game - Andar/Bahar Style */}
-              <TabsContent value="haruf">
+               <TabsContent value="haruf">
   <div className="bg-gray-800 rounded-2xl p-4">
     <div className="grid grid-cols-2 gap-4">
       {/* Andar Game */}
