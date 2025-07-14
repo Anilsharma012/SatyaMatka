@@ -4,7 +4,7 @@ const connectDB = async (): Promise<void> => {
   try {
     const mongoURI =
       process.env.MONGODB_URI ||
-      "mongodb+srv://Anilsharma:Anil123@thematka.gqrvpvx.mongodb.net/matka-hub";
+      "mongodb+srv://sachintakroia:Sachin123@cluster5.4ihtya2.mongodb.net/matka-hub";
 
     await mongoose.connect(mongoURI);
     console.log("MongoDB Atlas connected successfully");
