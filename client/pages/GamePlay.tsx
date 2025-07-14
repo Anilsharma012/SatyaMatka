@@ -990,50 +990,75 @@ const GamePlay = () => {
 
                   {/* Haruf Game - Andar/Bahar Style */}
                   <TabsContent value="haruf">
-                    <div className="bg-gray-800 rounded-2xl p-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        {/* Andar Game */}
-                        <div className="space-y-3">
-                          <h3 className="text-white text-base font-medium text-center mb-3">
-                            Andar Game
-                          </h3>
-                          {Array.from({ length: 10 }, (_, i) => (
-                            <div key={i} className="flex gap-2">
-                              <div className="w-10 h-9 bg-gray-600 rounded text-white font-medium text-sm flex items-center justify-center">
-                                A{i}
-                              </div>
-                              <input
-                                type="number"
-                                placeholder="00"
-                                className="flex-1 h-9 bg-gray-600 rounded text-white text-center font-medium text-sm border-none outline-none placeholder-gray-400 focus:bg-gray-500 transition-colors"
-                                max="5000"
-                              />
-                            </div>
-                          ))}
-                        </div>
+  <div className="bg-gray-800 rounded-2xl p-4">
+    <div className="grid grid-cols-2 gap-4">
+      {/* Andar Game */}
+      <div className="space-y-3">
+        <h3 className="text-white text-base font-medium text-center mb-3">
+          Andar Game
+        </h3>
+        {Array.from({ length: 10 }, (_, i) => {
+          const key = `A${i}`;
+          return (
+            <div key={key} className="flex gap-2 items-center">
+              <div className="w-10 h-9 bg-gray-600 rounded text-white font-medium text-sm flex items-center justify-center">
+                {key}
+              </div>
+              <input
+                type="number"
+                placeholder="00"
+                value={betData.betNumber === key ? betData.betAmount : ""}
+                onChange={(e) =>
+                  setBetData({
+                    ...betData,
+                    betNumber: key,
+                    betAmount: e.target.value,
+                    harufPosition: "first",
+                  })
+                }
+                className="flex-1 h-9 bg-gray-600 rounded text-white text-center font-medium text-sm border-none outline-none placeholder-gray-400 focus:bg-gray-500 transition-colors"
+                max="5000"
+              />
+            </div>
+          );
+        })}
+      </div>
 
-                        {/* Bahar Game */}
-                        <div className="space-y-3">
-                          <h3 className="text-white text-base font-medium text-center mb-3">
-                            Bahar Game
-                          </h3>
-                          {Array.from({ length: 10 }, (_, i) => (
-                            <div key={i} className="flex gap-2">
-                              <div className="w-10 h-9 bg-gray-600 rounded text-white font-medium text-sm flex items-center justify-center">
-                                B{i}
-                              </div>
-                              <input
-                                type="number"
-                                placeholder="00"
-                                className="flex-1 h-9 bg-gray-600 rounded text-white text-center font-medium text-sm border-none outline-none placeholder-gray-400 focus:bg-gray-500 transition-colors"
-                                max="5000"
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </TabsContent>
+      {/* Bahar Game */}
+      <div className="space-y-3">
+        <h3 className="text-white text-base font-medium text-center mb-3">
+          Bahar Game
+        </h3>
+        {Array.from({ length: 10 }, (_, i) => {
+          const key = `B${i}`;
+          return (
+            <div key={key} className="flex gap-2 items-center">
+              <div className="w-10 h-9 bg-gray-600 rounded text-white font-medium text-sm flex items-center justify-center">
+                {key}
+              </div>
+              <input
+                type="number"
+                placeholder="00"
+                value={betData.betNumber === key ? betData.betAmount : ""}
+                onChange={(e) =>
+                  setBetData({
+                    ...betData,
+                    betNumber: key,
+                    betAmount: e.target.value,
+                    harufPosition: "last",
+                  })
+                }
+                className="flex-1 h-9 bg-gray-600 rounded text-white text-center font-medium text-sm border-none outline-none placeholder-gray-400 focus:bg-gray-500 transition-colors"
+                max="5000"
+              />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+</TabsContent>
+
 
                   {/* Crossing Game - Exact Screenshot Match */}
                   <TabsContent value="crossing">
