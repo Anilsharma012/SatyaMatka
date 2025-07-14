@@ -455,25 +455,27 @@ const GameInterface = () => {
           </div>
         )}
 
-       {activeTab === "Haruf" && (
-  <div className="max-w-4xl mx-auto px-2 sm:px-4">
-    {/* Haruf Games Container */}
-    <div className="bg-gray-800 rounded-3xl p-3 sm:p-6 mb-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-        {/* Andar Game */}
-        <div className="space-y-4">
-          <h3 className="text-gray-300 text-lg font-medium text-center mb-4">
-            Andar Game
-          </h3>
+    {activeTab === "Haruf" && (
+  <div className="max-w-4xl mx-auto px-4 sm:px-6">
+    <h2 className="text-center text-2xl font-bold text-white mb-4">
+      Haruf Game
+    </h2>
 
+    {/* Haruf Input Grid */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Andar (A0 - A9) */}
+      <div className="bg-gray-800 p-4 rounded-2xl">
+        <h3 className="text-yellow-400 text-lg font-semibold text-center mb-4">
+          Andar Game
+        </h3>
+        <div className="space-y-3">
           {Array.from({ length: 10 }, (_, i) => (
-            <div key={`A${i}`} className="flex gap-3 items-center">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-600 rounded-xl text-white font-medium text-sm sm:text-base flex items-center justify-center">
+            <div key={`A${i}`} className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gray-600 text-white rounded-md flex items-center justify-center font-semibold">
                 A{i}
               </div>
               <Input
                 type="number"
-                placeholder="00"
                 value={harufBets[`A${i}`] || ""}
                 onChange={(e) => {
                   const value = parseInt(e.target.value) || 0;
@@ -481,26 +483,27 @@ const GameInterface = () => {
                     handleHarufBet(`A${i}`, value);
                   }
                 }}
-                className="flex-1 h-10 sm:h-12 bg-gray-600 rounded-xl text-white text-center font-medium text-sm sm:text-base border-none outline-none placeholder-gray-400 focus:bg-gray-500 transition-colors"
+                placeholder="Amount"
+                className="flex-1 bg-gray-700 text-white placeholder-gray-400"
               />
             </div>
           ))}
         </div>
+      </div>
 
-        {/* Bahar Game */}
-        <div className="space-y-4">
-          <h3 className="text-gray-300 text-lg font-medium text-center mb-4">
-            Bahar Game
-          </h3>
-
+      {/* Bahar (B0 - B9) */}
+      <div className="bg-gray-800 p-4 rounded-2xl">
+        <h3 className="text-yellow-400 text-lg font-semibold text-center mb-4">
+          Bahar Game
+        </h3>
+        <div className="space-y-3">
           {Array.from({ length: 10 }, (_, i) => (
-            <div key={`B${i}`} className="flex gap-3 items-center">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-600 rounded-xl text-white font-medium text-sm sm:text-base flex items-center justify-center">
+            <div key={`B${i}`} className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gray-600 text-white rounded-md flex items-center justify-center font-semibold">
                 B{i}
               </div>
               <Input
                 type="number"
-                placeholder="00"
                 value={harufBets[`B${i}`] || ""}
                 onChange={(e) => {
                   const value = parseInt(e.target.value) || 0;
@@ -508,7 +511,8 @@ const GameInterface = () => {
                     handleHarufBet(`B${i}`, value);
                   }
                 }}
-                className="flex-1 h-10 sm:h-12 bg-gray-600 rounded-xl text-white text-center font-medium text-sm sm:text-base border-none outline-none placeholder-gray-400 focus:bg-gray-500 transition-colors"
+                placeholder="Amount"
+                className="flex-1 bg-gray-700 text-white placeholder-gray-400"
               />
             </div>
           ))}
@@ -516,17 +520,14 @@ const GameInterface = () => {
       </div>
     </div>
 
-    {/* SAVE Button */}
+    {/* Save Button */}
     <Button
-      className="w-full mb-8 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-4 text-xl rounded-full transition-all duration-300"
+      className="mt-6 w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold text-xl py-3 rounded-xl"
       onClick={() => {
-        const totalHarufAmount = Object.values(harufBets).reduce(
-          (sum, amount) => sum + amount,
-          0
-        );
-        if (totalHarufAmount > 0) {
-          setTotalAmount(totalHarufAmount);
-          alert(`Haruf bets saved! Total: ₹${totalHarufAmount}`);
+        const total = Object.values(harufBets).reduce((sum, val) => sum + val, 0);
+        if (total > 0) {
+          setTotalAmount(total);
+          alert(`Haruf bet saved! Total ₹${total}`);
         } else {
           alert("कृपया कम से कम एक bet लगाएं");
         }
@@ -535,26 +536,25 @@ const GameInterface = () => {
       SAVE
     </Button>
 
-    {/* Bottom Total and Submit */}
-    <div className="bg-gray-800 rounded-3xl p-6 flex items-center justify-between">
+    {/* Submit Section */}
+    <div className="bg-gray-800 p-4 mt-6 rounded-2xl flex items-center justify-between">
       <div>
-        <div className="text-gray-400 text-base">Total Amount</div>
-        <div className="text-white text-3xl font-bold">
+        <p className="text-gray-400 text-sm">Total Amount</p>
+        <p className="text-white text-3xl font-bold">
           ₹{Object.values(harufBets).reduce((sum, amt) => sum + amt, 0)}
-        </div>
+        </p>
       </div>
       <Button
-        className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold px-8 py-3 text-lg rounded-full"
         onClick={handleSubmit}
-        disabled={
-          Object.values(harufBets).reduce((sum, amt) => sum + amt, 0) === 0
-        }
+        className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold px-6 py-3 text-lg rounded-xl"
+        disabled={Object.values(harufBets).reduce((a, b) => a + b, 0) === 0}
       >
         SUBMIT
       </Button>
     </div>
   </div>
 )}
+
 
       </div>
 
