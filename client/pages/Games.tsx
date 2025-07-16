@@ -375,35 +375,30 @@ const Games = () => {
                           </Badge>
                         </div>
                         <div className="space-y-1">
-                          {result.jodiResult && (
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground text-xs">
-                                Jodi:
-                              </span>
-                              <span className="text-foreground font-bold">
-                                {result.jodiResult}
-                              </span>
-                            </div>
-                          )}
+                        <div className="flex justify-between">
+  <span className="text-muted-foreground text-xs">Jodi:</span>
+  <span className="text-foreground font-bold">
+    {result?.jodiResult || result?.declaredResult || "-"}
+  </span>
+</div>
+
                           {result.harufResult && (
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground text-xs">
-                                Haruf:
-                              </span>
-                              <span className="text-foreground font-bold">
-                                {result.harufResult}
-                              </span>
-                            </div>
+                          <div className="flex justify-between">
+                          <span className="text-muted-foreground text-xs">Haruf:</span>
+                          <span className="text-foreground font-bold">
+                            {result?.harufResult || result?.declaredResult || "-"}
+                          </span>
+                        </div>
+                        
                           )}
                           {result.crossingResult && (
                             <div className="flex justify-between">
-                              <span className="text-muted-foreground text-xs">
-                                Crossing:
-                              </span>
-                              <span className="text-foreground font-bold">
-                                {result.crossingResult}
-                              </span>
-                            </div>
+                            <span className="text-muted-foreground text-xs">Crossing:</span>
+                            <span className="text-foreground font-bold">
+                              {result?.crossingResult || result?.declaredResult || "-"}
+                            </span>
+                          </div>
+                          
                           )}
                         </div>
                       </div>

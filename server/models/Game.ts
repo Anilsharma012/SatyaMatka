@@ -6,7 +6,7 @@ export interface IGame extends Document {
   description: string;
   isActive: boolean;
 
-  // Timing
+  
   startTime: string; // HH:mm format
   endTime: string; // HH:mm format
   resultTime: string; // HH:mm format
@@ -21,6 +21,13 @@ export interface IGame extends Document {
   jodiPayout: number; // e.g., 95 (95:1)
   harufPayout: number; // e.g., 9 (9:1)
   crossingPayout: number; // e.g., 180 (180:1)
+
+
+  result?: {
+    jodi: string;
+    haruf: string;
+    crossing: string;
+  };
 
   // Crossing Game Rules (if applicable)
   crossingRules?: {
@@ -60,7 +67,7 @@ const GameSchema: Schema = new Schema(
     type: {
       type: String,
       enum: ["jodi", "haruf", "crossing"],
-      required: true,
+      required: false,
       index: true,
     },
     description: {
@@ -153,6 +160,13 @@ const GameSchema: Schema = new Schema(
       trim: true,
       index: true,
     },
+    result: {
+      jodi: { type: String, trim: true },
+      haruf: { type: String, trim: true },
+      crossing: { type: String, trim: true },
+    },
+    
+    
     resultDeclaredAt: {
       type: Date,
       index: true,

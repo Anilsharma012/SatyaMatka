@@ -8,31 +8,46 @@ import { adminAuth, AdminRequest } from "../middleware/adminAuth";
 
 const router = express.Router();
 
-// 🧩 Unified Result Declaration System API Endpoints
 
-/**
- * @route POST /api/results/declare/:gameId
- * @desc Manually declare result for a game
- * @access Admin only
- */
-router.post("/declare/:gameId", adminAuth, async (req, res) => {
+
+
+
+const disableTestLimits = (req: any, res: any, next: any) => {
+  // Skip test limit checks in development
+  if (process.env.NODE_ENV === 'development') {
+    return next();
+  }
+
+  // Original test limit logic would go here
+  next();
+};
+
+router.post("/declare/:gameId", adminAuth, disableTestLimits, async (req, res) => {
   try {
     const { gameId } = req.params;
-    const { declaredResult } = req.body;
+    const {
+      declaredResult,
+      jodiResult,
+      harufResult,
+      crossingResult
+    } = req.body;
+
     const adminId = (req as AdminRequest).admin?._id;
 
+    // Determine which result to use based on what's provided
+    const resultToUse = jodiResult || harufResult || crossingResult || declaredResult;
+
     // Validate input
-    if (!declaredResult || typeof declaredResult !== "string") {
+    if (!resultToUse) {
       return res.status(400).json({
         success: false,
-        message: "Declared result is required and must be a string",
+        message: "No valid result provided. Please provide a result for the game type.",
       });
     }
 
     // Validate game exists and is in correct status
-
-    const game = await Game.findById(gameId).select("name").lean();
-    const gameName = (game as any)?.name || "N/A";
+    const now = new Date();
+    const game = await Game.findById(gameId);
 
     if (!game) {
       return res.status(404).json({
@@ -40,6 +55,8 @@ router.post("/declare/:gameId", adminAuth, async (req, res) => {
         message: "Game not found",
       });
     }
+
+    const gameName = game.name || "N/A";
 
     if (game.declaredResult) {
       return res.status(400).json({
@@ -55,10 +72,30 @@ router.post("/declare/:gameId", adminAuth, async (req, res) => {
       });
     }
 
+    // Determine which result to use based on game type
+    let resultValue = '';
+    if (game.type === 'jodi') {
+      resultValue = jodiResult || resultToUse;
+    } else if (game.type === 'haruf') {
+      resultValue = harufResult || resultToUse;
+    } else if (game.type === 'crossing') {
+      resultValue = crossingResult || resultToUse;
+    } else {
+      resultValue = resultToUse; // fallback
+    }
+
+    if (!resultValue) {
+      return res.status(400).json({
+        success: false,
+        message: `No valid ${game.type} result provided`,
+      });
+    }
+
     // Update game with declared result
-    const now = new Date();
-    await Game.findByIdAndUpdate(gameId, {
-      declaredResult: declaredResult.trim(),
+    const resultStr = resultValue.trim();
+
+    const updateData: any = {
+      declaredResult: resultStr,
       resultDeclaredAt: now,
       resultDeclaredBy: adminId,
       resultMethod: "manual",
@@ -66,31 +103,55 @@ router.post("/declare/:gameId", adminAuth, async (req, res) => {
       isResultPending: false,
       lastResultDate: now,
       lastStatusChange: now,
-    });
+      result: {
+        jodi: game.type === "jodi" ? resultStr : "",
+        haruf: game.type === "haruf" ? resultStr : "",
+        crossing: game.type === "crossing" ? resultStr : "",
+      },
+    };
+    
+
+
+
+    await Game.findByIdAndUpdate(gameId, updateData);
 
     // Process all bets for this game and determine winners/losers
-    const processedBets = await processBetsForResult(
+    const processedBets = await processBetsForResult(gameId, {
+      jodi: jodiResult || '',
+      haruf: harufResult || '',
+      crossing: crossingResult || '',
+      fallback: resultToUse.trim(),
+    });
+    
+
+
+    console.log(`🎯 Result declared for game ${gameName} (${game.type}): ${resultValue}`);
+    console.log(`📊 Processed ${processedBets.totalBets} bets: ${processedBets.winningBets} wins, ${processedBets.losingBets} losses`);
+
+    // Prepare response with all relevant result data
+    const responseData: any = {
       gameId,
-      declaredResult.trim(),
-    );
+      gameName: gameName,
+      gameType: game.type,
+      declaredResult: resultValue.trim(),
+      resultDeclaredAt: now,
+      method: "manual",
+      processedBets,
+    };
 
-    console.log(`🎯 Result declared for game ${gameName}: ${declaredResult}`);
-
-    console.log(
-      `📊 Processed ${processedBets.totalBets} bets: ${processedBets.winningBets} wins, ${processedBets.losingBets} losses`,
-    );
+    // Include specific result field in response
+    if (game.type === 'jodi') {
+      responseData.jodiResult = resultValue.trim();
+    } else if (game.type === 'haruf') {
+      responseData.harufResult = resultValue.trim();
+    } else if (game.type === 'crossing') {
+      responseData.crossingResult = resultValue.trim();
+    }
 
     res.json({
       success: true,
-      message: "Result declared successfully",
-      data: {
-        gameId,
-        gameName: gameName,
-        declaredResult: declaredResult.trim(),
-        resultDeclaredAt: now,
-        method: "manual",
-        processedBets,
-      },
+      message: `Result declared successfully for ${game.type} game`,
+      data: responseData,
     });
   } catch (error: any) {
     console.error("❌ Error declaring result:", error);
@@ -102,11 +163,7 @@ router.post("/declare/:gameId", adminAuth, async (req, res) => {
   }
 });
 
-/**
- * @route GET /api/results/pending
- * @desc Get all games pending result declaration
- * @access Admin only
- */
+
 router.get("/pending", adminAuth, async (req, res) => {
   try {
     const now = new Date();
@@ -167,40 +224,102 @@ router.get("/pending", adminAuth, async (req, res) => {
   }
 });
 
-/**
- * @route GET /api/results/history
- * @desc Get result declaration history
- * @access Admin only
- */
+
 router.get("/history", adminAuth, async (req, res) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
     const skip = (page - 1) * limit;
 
-    const resultsHistory = await Game.find({
-      declaredResult: { $exists: true, $ne: null },
-    })
-      .populate("createdBy resultDeclaredBy", "name email")
-      .sort({ resultDeclaredAt: -1 })
-      .skip(skip)
-      .limit(limit);
+    // Parse query parameters
+    const filters = {
+      gameType: req.query.gameType as string,
+      dateRange: req.query.dateRange as string,
+      status: req.query.status as string,
+    };
 
-    const total = await Game.countDocuments({
-      declaredResult: { $exists: true, $ne: null },
-    });
+    // Build query based on filters
+    const query: any = {
+      declaredResult: { $exists: true },
+      resultDeclaredAt: { $exists: true },
+    };
+
+    // Apply game type filter
+    if (filters.gameType) {
+      query.type = filters.gameType;
+    }
+
+    // Apply date range filter
+    if (filters.dateRange) {
+      const [startDate, endDate] = filters.dateRange.split(",");
+      query.resultDeclaredAt = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
+
+    // Apply status filter
+    if (filters.status) {
+      query.currentStatus = filters.status;
+    }
+
+    // Fetch results with aggregation for better performance
+    const pipeline = [
+      { $match: query },
+      { $sort: { resultDeclaredAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: "users",
+          localField: "createdBy",
+          foreignField: "_id",
+          as: "admin",
+        },
+      },
+      {
+        $addFields: {
+          adminName: { $arrayElemAt: ["$admin.name", 0] },
+          resultDate: {
+            $dateToString: { format: "%Y-%m-%d", date: "$resultDeclaredAt" },
+          },
+        },
+      },
+      { $unset: ["admin"] },
+    ];
+
+    const games = await Game.aggregate(pipeline as any);
+
+
+
+    const totalGames = await Game.countDocuments(query);
+
+    // Calculate statistics
+    const statsArray = await Game.aggregate([
+      { $match: query },
+      {
+        $group: {
+          _id: null,
+          totalGames: { $sum: 1 },
+          totalWinningAmount: { $sum: "$totalWinAmount" },
+          avgWinningAmount: { $avg: "$totalWinAmount" },
+        },
+      },
+    ]).exec();
+
+    const stats = statsArray[0] || {};
+
 
     res.json({
       success: true,
-      data: {
-        results: resultsHistory,
-        pagination: {
-          currentPage: page,
-          totalPages: Math.ceil(total / limit),
-          totalResults: total,
-          hasNext: page < Math.ceil(total / limit),
-          hasPrev: page > 1,
-        },
+      games,
+      totalPages: Math.ceil(totalGames / limit),
+      currentPage: page,
+      totalGames,
+      statistics: stats,
+      filters: {
+        availableGameTypes: ["jodi", "haruf", "crossing"],
+        availableStatuses: ["waiting", "open", "closed", "result_declared"],
       },
     });
   } catch (error: any) {
@@ -213,11 +332,7 @@ router.get("/history", adminAuth, async (req, res) => {
   }
 });
 
-/**
- * @route GET /api/results/game/:gameId
- * @desc Get result for a specific game
- * @access Public (for users to see results)
- */
+
 router.get("/game/:gameId", async (req, res) => {
   try {
     const { gameId } = req.params;
@@ -274,11 +389,7 @@ router.get("/game/:gameId", async (req, res) => {
   }
 });
 
-/**
- * @route GET /api/results/user-bets/:gameId
- * @desc Get user's bet results for a game
- * @access Protected (logged in users)
- */
+
 router.get("/user-bets/:gameId", auth, async (req, res) => {
   try {
     const { gameId } = req.params;
@@ -308,7 +419,7 @@ router.get("/user-bets/:gameId", auth, async (req, res) => {
       const betObj = bet.toObject();
 
       if (game.declaredResult) {
-        const isWinning = checkBetWinning(bet, game.declaredResult);
+        const isWinning = checkBetWinning(bet, game.declaredResult as any);
         return {
           ...betObj,
           isWinning,
@@ -358,12 +469,18 @@ router.get("/user-bets/:gameId", auth, async (req, res) => {
   }
 });
 
-// 🔧 Helper Functions
 
-/**
- * Process all bets for a game when result is declared
- */
-async function processBetsForResult(gameId: string, declaredResult: string) {
+
+
+async function processBetsForResult(
+  gameId: string,
+  declaredResultObj: {
+    jodi: string;
+    haruf: string;
+    crossing: string;
+    fallback: string;
+  }
+) {
   try {
     const bets = await Bet.find({ gameId }).populate("userId", "name email");
 
@@ -372,14 +489,17 @@ async function processBetsForResult(gameId: string, declaredResult: string) {
     let totalWinAmount = 0;
 
     for (const bet of bets) {
-      const isWinning = checkBetWinning(bet, declaredResult);
+      const isWinning = checkBetWinning(bet, declaredResultObj);
+
+
 
       // Update bet with result
       await Bet.findByIdAndUpdate(bet._id, {
         isWinning,
         resultDeclared: true,
         resultDeclaredAt: new Date(),
-        declaredResult,
+
+        declaredResult: declaredResultObj.fallback,
       });
 
       if (isWinning) {
@@ -414,40 +534,139 @@ async function processBetsForResult(gameId: string, declaredResult: string) {
   }
 }
 
-/**
- * Check if a bet is winning based on declared result
- */
-function checkBetWinning(bet: any, declaredResult: string): boolean {
-  switch (bet.betType) {
-    case "jodi":
-      // For Jodi: exact match with bet number
-      return bet.betNumber === declaredResult;
 
-    case "haruf":
-      // For Haruf: check if declared result contains the bet digit in correct position
-      if (bet.harufPosition === "first" || bet.harufPosition === "start") {
-        return declaredResult.charAt(0) === bet.betNumber;
-      } else if (bet.harufPosition === "last" || bet.harufPosition === "end") {
-        return (
-          declaredResult.charAt(declaredResult.length - 1) === bet.betNumber
-        );
-      }
-      // Default: check if digit appears anywhere
-      return declaredResult.includes(bet.betNumber);
 
-    case "crossing":
-      // For Crossing: check if any of the crossing combinations match
-      if (bet.crossingCombinations && Array.isArray(bet.crossingCombinations)) {
-        return bet.crossingCombinations.some(
-          (combo: any) => combo.number === declaredResult,
-        );
-      }
-      // Fallback: direct match
-      return bet.betNumber === declaredResult;
 
-    default:
-      return false;
+
+function checkBetWinning(
+  bet: any,
+  declaredResults: {
+    jodi: string;
+    haruf: string;
+    crossing: string;
+    fallback: string;
   }
+): boolean {
+  const betNumber = bet.betNumber?.toString() || '';
+  const betType = bet.betType?.toLowerCase();
+  const betData = bet.betData || {};
+
+  if (!declaredResults || !betType) {
+    console.warn('Missing required data for bet check:', { declaredResults, betType, betId: bet._id });
+    return false;
+  }
+
+  // Jodi bet - exact match with declared result
+  if (betType === 'jodi') {
+    return betNumber === declaredResults.jodi;
+  }
+
+
+  // Haruf bet - match first or last digit based on position
+  if (betType === 'haruf') {
+    // ✅ Check if haruf result exists
+    if (!declaredResults.haruf || declaredResults.haruf.length < 1) {
+      console.warn("⚠️ Haruf result missing or empty");
+      return false;
+    }
+  
+    const firstDigit = declaredResults.haruf[0];
+    const lastDigit = declaredResults.haruf[declaredResults.haruf.length - 1];
+  
+    // Get the digit and position from bet data
+    let harufDigit = betData.harufDigit || '';
+    let harufPosition = betData.harufPosition || '';
+  
+    // Fallback for legacy data - extract from betNumber (e.g., 'A1' or 'B4')
+    if (!harufDigit || !harufPosition) {
+      const match = betNumber.match(/^([AB])(\d)$/i);
+      if (match) {
+        harufPosition = match[1].toLowerCase() === 'a' ? 'first' : 'last';
+        harufDigit = match[2];
+      }
+    }
+  
+    // Check for win condition
+    if (harufPosition && harufDigit) {
+      if (harufPosition === 'first' || harufPosition === 'andhar') {
+        return harufDigit === firstDigit;
+      } else if (harufPosition === 'last' || harufPosition === 'bahar') {
+        return harufDigit === lastDigit;
+      }
+    }
+  
+    return false;
+  }
+  
+
+  // Crossing bet - any combination of two different digits from the result
+  if (betType === 'crossing') {
+    const digits = declaredResults.crossing.split('');
+
+    const outcomes = [];
+
+    // Generate all possible 2-digit combinations from the result
+    for (let i = 0; i < digits.length; i++) {
+      for (let j = 0; j < digits.length; j++) {
+        if (i !== j) {
+          outcomes.push(digits[i] + digits[j]);
+        }
+      }
+    }
+
+    return outcomes.includes(betNumber);
+  }
+
+  console.warn(`Unknown bet type: ${betType}`);
+
+  return false;
 }
+
+
+
+function testHarufLogic() {
+  console.log('\n🔍 Testing Haruf Bet Logic\n' + '='.repeat(30));
+
+  const testCases = [
+    ['A1', 'andhar', '14', true],
+    ['B4', 'bahar', '14', true],
+    ['A5', 'andhar', '14', false],
+    ['B2', 'bahar', '14', false],
+    ['A1', 'bahar', '14', false],
+    ['B4', 'andhar', '14', false],
+  ];
+
+  let passed = 0;
+  let failed = 0;
+
+  testCases.forEach(([betNumber, position, declaredResult, shouldWin], index) => {
+    const bet = {
+      number: betNumber,
+      position,
+      betType: 'haruf'
+    };
+
+    const result = checkBetWinning(bet as any, declaredResult as any);
+    const status = result === shouldWin ? '✅ PASS' : '❌ FAIL';
+
+    if (result === shouldWin) passed++;
+    else failed++;
+
+    console.log(`Test ${index + 1}: ${status}`);
+    console.log(`  Bet: ${betNumber} (${position})`);
+    console.log(`  Result: ${declaredResult}`);
+    console.log(`  Expected: ${shouldWin ? 'Win' : 'Lose'}, Got: ${result ? 'Win' : 'Lose'}\n`);
+  });
+
+
+
+  console.log('\n📊 Test Results:');
+  console.log(`✅ Passed: ${passed}`);
+  console.log(`❌ Failed: ${failed}`);
+  console.log(`${'='.repeat(30)}\n`);
+}
+
+
+testHarufLogic();
 
 export default router;
